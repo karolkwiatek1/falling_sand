@@ -70,6 +70,20 @@ void removeGraind() {
     }
 }
 
+void randomPattern() {
+    int i = 0;
+    while (i < 300000) {
+        int randx = rand() % SCREEN_WIDTH;
+        int randy = rand() % SCREEN_HEIGHT;
+        int idx = randy * COLS + randx;
+        if(grid[idx] == 0) {
+            grid[idx] = 1;
+            grainCount++;
+            i++;
+        }
+    }
+}
+
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sand simulator");
@@ -88,6 +102,8 @@ int main(void) {
         if (IsKeyPressed(KEY_UP)) physicsSteps++;
 
         if (IsKeyPressed(KEY_DOWN) && physicsSteps > 1) physicsSteps--;
+
+        if (IsKeyPressed(KEY_R)) randomPattern();
 
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             addGrains();
