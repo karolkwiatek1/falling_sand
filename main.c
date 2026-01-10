@@ -5,8 +5,8 @@
 #include <stdio.h>
 
 // config
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 720
+#define SCREEN_HEIGHT SCREEN_WIDTH
 #define CELL_SIZE 2
 #define CHUNK_SIZE 32
 
@@ -135,6 +135,44 @@ void randomPattern() {
     }
 }
 
+void rotateRight() {
+    char* newGrid = (char *)calloc(COLS * ROWS, sizeof(char));
+    for (int y = 0; y < ROWS; y++) {
+        for(int x = 0; x < COLS; x++){
+            int src_index = (y * ROWS) + x;
+            int dest_index = ((COLS - 1 - x) * ROWS) + y;
+
+            newGrid[dest_index] = grid[src_index];
+        }
+    }
+    free(grid);
+    grid = newGrid;
+    for (int x = 0; x < NUM_CHUNKS_X; x++){
+        for (int y = 0; y < NUM_CHUNKS_Y; y++){
+            wakeChunk(x, y);
+        }
+    }
+}
+
+void rotateLeft() {
+    char* newGrid = (char *)calloc(COLS * ROWS, sizeof(char));
+    for (int y = 0; y < ROWS; y++) {
+        for(int x = 0; x < COLS; x++){
+            int src_index = (y * ROWS) + x;
+            int dest_index = (x * ROWS) + (ROWS - 1 - y);
+
+            newGrid[dest_index] = grid[src_index];
+        }
+    }
+    free(grid);
+    grid = newGrid;
+    for (int x = 0; x < NUM_CHUNKS_X; x++){
+        for (int y = 0; y < NUM_CHUNKS_Y; y++){
+            wakeChunk(x, y);
+        }
+    }
+}
+
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sand simulator");
@@ -152,7 +190,7 @@ int main(void) {
     //begin by waking up all chunks
     for (int x = 0; x < NUM_CHUNKS_X; x++){
         for (int y = 0; y < NUM_CHUNKS_Y; y++){
-            activeChunks[x][y] = true;
+            wakeChunk(x, y);
         }
     }
 
@@ -163,7 +201,11 @@ int main(void) {
         if (IsKeyPressed(KEY_DOWN) && physicsSteps > 1) physicsSteps--;
 
         if (IsKeyPressed(KEY_R)) randomPattern();
+
         if (IsKeyPressed(KEY_D)) showDebug = !showDebug;
+
+        if (IsKeyPressed(KEY_LEFT)) rotateLeft();
+        if (IsKeyPressed(KEY_RIGHT)) rotateRight();
 
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             addGrains();
